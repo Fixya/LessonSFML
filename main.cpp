@@ -5,6 +5,6 @@ using namespace sf;
 int main()
 {
 	Game game;
-	game.Play();
+	game.play();
 	return 0;
 }
