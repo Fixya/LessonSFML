@@ -7,28 +7,32 @@
 class Game {
 private:
 	sf::RenderWindow window;
-	std::vector<Meteor*> meteors;
+	Player player;
+	std::vector<Meteor*> meteorSprites;
+	Text_ob lives;
+	sf::RectangleShape rect;
 public:
 	void spawnMeteors(size_t n) {
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < n; i++)
+		{
 			int num = rand() % 4 + 1;
-			std::string fileName = "images\\spaceMeteors_00" + std::to_string(num) + ".png";
-			Meteor::MeteorSize size = (Meteor::MeteorSize)(rand() % 3);
-			float x = rand() % 1801 - 300.f;
-			float y = rand() % 1501 - 300.f;
-			float speedx = rand() % 11 - 5.f;
-			float speedy = rand() % 11 - 5.f;
-			Meteor* m = new Meteor(fileName, size, sf::Vector2f{ x,y }, sf::Vector2f{ speedx, speedy });
-			meteors.push_back(m);
+			Meteor* m = new Meteor();
+			meteorSprites.push_back(m);
 		}
 	}
-	Game() {
+
+	Game() : lives(std::to_string(player.getLives()), sf::Vector2f { WINDOW_WIDTH/2, 0.f })
+	{
 		window.create(sf::VideoMode{ (size_t)WINDOW_WIDTH, (size_t)WINDOW_HEIGHT }, WINDOW_TITLE);
 		window.setFramerateLimit(FPS);
-		spawnMeteors(20);
+		meteorSprites.reserve(Meteor_QTY);
+		spawnMeteors(Meteor_QTY);
+		rect.setSize(sf::Vector2f(RECT_WIDTH, RECT_HEIGHT));
+		rect.setFillColor(RECT_COLOR);
+		rect.setPosition(RECT_POS);
 	}
 
-	Player player;
+	
 
 	void checkEvents() {
 		sf::Event event;
@@ -37,20 +41,18 @@ public:
 	}
 
 	void update() {
-		for (int i = 0; i < meteors.size(); i++) {
-			meteors.at(i)->update();
-		}
 		player.update();
+		for (auto m : meteorSprites) m ->update();
+		lives.update(std::to_string(player.getLives));
 	}
 
 	void checkCollisions() {}
 
 	void draw() {
 		window.clear();
-		for (int i = 0; i < meteors.size(); i++) {
-			window.draw(meteors.at(i)->getSprite());
-		}
+		for (auto m : meteorSprites) window.draw(m->getSprite());
 		window.draw(player.getSprite());
+		window.draw(lives.getText);
 		window.display();
 	}
 
