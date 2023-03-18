@@ -21,7 +21,7 @@ public:
 		}
 	}
 
-	Game() : lives(std::to_string(player.getLives()), sf::Vector2f { WINDOW_WIDTH/2, 0.f })
+	Game() : lives(std::to_string(player.getLives()), sf::Vector2f{ WINDOW_WIDTH / 2, 0.f })
 	{
 		window.create(sf::VideoMode{ (size_t)WINDOW_WIDTH, (size_t)WINDOW_HEIGHT }, WINDOW_TITLE);
 		window.setFramerateLimit(FPS);
@@ -32,7 +32,7 @@ public:
 		rect.setPosition(RECT_POS);
 	}
 
-	
+
 
 	void checkEvents() {
 		sf::Event event;
@@ -42,7 +42,7 @@ public:
 
 	void update() {
 		player.update();
-		for (auto m : meteorSprites) m ->update();
+		for (auto m : meteorSprites) m->update();
 		lives.update(std::to_string(player.getLives));
 	}
 
@@ -52,7 +52,7 @@ public:
 		window.clear();
 		for (auto m : meteorSprites) window.draw(m->getSprite());
 		window.draw(player.getSprite());
-		window.draw(lives.getText);
+		window.draw(lives.getText());
 		window.display();
 	}
 

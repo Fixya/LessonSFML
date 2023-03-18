@@ -1,6 +1,9 @@
 ﻿#pragma once
 #include "settings.h"
 #include "game.h"
+#include "laser.h"
+#include <list>
+#include <ctime>
 
 class Text_ob
 {
@@ -16,9 +19,9 @@ public:
 		text.setCharacterSize(CHAR_SIZE);
 		text.setPosition(pos);
 	}
-	void update()
+	void update(std::string kol)
 	{
-		
+		text.setString(kol);
 	}
 	sf::Text getText() { return text; }
 };
@@ -28,8 +31,9 @@ class Player
 private:
 	sf::Sprite sprite;
 	sf::Texture texture;
-	float speedx, speedy;
+	float speedx=0, speedy=0;
 	int lives = 3;
+	std::list<Laser*> lasers; 
 public:
 	Player() {
 		texture.loadFromFile(PLAYER_NAME_FILE);
@@ -53,9 +57,19 @@ public:
 			sprite.setPosition(0, sprite.getPosition().y); 
 		if (sprite.getPosition().x + 100 >= WINDOW_WIDTH)
 			sprite.setPosition(WINDOW_WIDTH - 100, sprite.getPosition().y);
+		if (sprite.getPosition().x + 100 >= WINDOW_WIDTH)
+			sprite.setPosition(WINDOW_WIDTH - 100, sprite.getPosition().y);
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) { fire(); }
+		for (auto laser : lasers) { laser->upbate(); }
 	}
+	void draw(sf::RenderWindow& window) { for (auto laser : lasers) { window.draw(laser->getSprite()); } }
 	void incLives() { lives++; }
 	void decLives() { lives--; }
 	sf::Sprite getSprite() { return sprite; }
 	int getLives() { return lives; }
+	void fire()
+	{
+		Laser* l = new Laser(sprite.getPosition());
+		lasers.push_back;
+	}
 };
