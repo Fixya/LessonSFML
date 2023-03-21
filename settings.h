@@ -6,17 +6,19 @@ const float WINDOW_HEIGHT = 1000;
 const std::string WINDOW_TITLE = "Space Travel";
 const float FPS = 60.f;
 
-const std::string PLAYER_NAME_FILE = "player_blue.png";
-const std::string LASER_NAME_FILE = "laser.png";
-const sf::Vector2f MeteorSize { WINDOW_WIDTH / 2, WINDOW_HEIGHT - 550 };
-const int met_type_qty = 4;
-const size_t Meteor_QTY = 50;
+const std::string LASER_FILE_NAME = "laser.png";
+const std::string PLAYER_FILE_NAME = "player_blue.png";
+const sf::Vector2f MeteorSize{ WINDOW_WIDTH / 2, WINDOW_HEIGHT - 550 };
+const int METEOR_TYPES_QTY = 4;
+const size_t METEOR_QTY = 50;
+const float PLAYER_SPEED = 10.f;
 
-const std::string RES_SIZE = "res\\";
+const std::string RES_FOLDER = "res\\";
+const std::string IMAGES_FOLDER = "meteor_";
 const std::string FONT_FILE_NAME = "DS-DIGIB.ttf";
 const size_t CHAR_SIZE = 32;
 
 const float RECT_WIDTH = 250.f;
 const float RECT_HEIGHT = 15.f;
 const sf::Color RECT_COLOR{ sf::Color(0, 0, 0) };
-const sf::Vector2f RECT_POS{ 0.f, 0.f };
+const sf::Vector2f RECT_POS{ 0, 0 };

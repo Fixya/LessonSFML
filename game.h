@@ -1,38 +1,17 @@
 ﻿#pragma once
-#include "settings.h" 
-#include <vector> 
+#include "settings.h"
 #include "player.h"
 #include "meteor.h"
+#include <vector>
+#include "text.h"
 
 class Game {
 private:
 	sf::RenderWindow window;
 	Player player;
 	std::vector<Meteor*> meteorSprites;
-	Text_ob lives;
+	TextObj lives;
 	sf::RectangleShape rect;
-public:
-	void spawnMeteors(size_t n) {
-		for (int i = 0; i < n; i++)
-		{
-			int num = rand() % 4 + 1;
-			Meteor* m = new Meteor();
-			meteorSprites.push_back(m);
-		}
-	}
-
-	Game() : lives(std::to_string(player.getLives()), sf::Vector2f{ WINDOW_WIDTH / 2, 0.f })
-	{
-		window.create(sf::VideoMode{ (size_t)WINDOW_WIDTH, (size_t)WINDOW_HEIGHT }, WINDOW_TITLE);
-		window.setFramerateLimit(FPS);
-		meteorSprites.reserve(Meteor_QTY);
-		spawnMeteors(Meteor_QTY);
-		rect.setSize(sf::Vector2f(RECT_WIDTH, RECT_HEIGHT));
-		rect.setFillColor(RECT_COLOR);
-		rect.setPosition(RECT_POS);
-	}
-
-
 
 	void checkEvents() {
 		sf::Event event;
@@ -42,22 +21,42 @@ public:
 
 	void update() {
 		player.update();
-		for (auto m : meteorSprites) m->update();
-		lives.update(std::to_string(player.getLives));
+		for (auto m : meteorSprites) {
+			m->update();
+		}
+		lives.update(std::to_string(player.getLives()));
 	}
 
 	void checkCollisions() {}
 
 	void draw() {
 		window.clear();
-		for (auto m : meteorSprites) window.draw(m->getSprite());
-		window.draw(player.getSprite());
+		player.draw(window);
+		for (auto m : meteorSprites) {
+			window.draw(m->getSprite());
+		}
+		window.draw(rect);
 		window.draw(lives.getText());
 		window.display();
 	}
 
+public:
+	Game() :
+		window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE),
+		lives(std::to_string(player.getLives()), sf::Vector2f{ WINDOW_WIDTH / 2,0.f })
+	{
+		window.setFramerateLimit(FPS);
+		meteorSprites.reserve(METEOR_QTY);
+		for (int i = 0; i < METEOR_QTY; i++) {
+			meteorSprites.push_back(new Meteor());
+		}
+		rect.setFillColor(sf::Color::Black);
+		rect.setSize(sf::Vector2f{ WINDOW_WIDTH, 40.f });
+	}
+
 	void play() {
-		while (window.isOpen()) {
+		while (window.isOpen())
+		{
 			checkEvents();
 			update();
 			checkCollisions();
