@@ -1,26 +1,42 @@
 ﻿#pragma once
+#include <list>
 #include "settings.h"
 #include "laser.h"
-#include <list>
-#include <ctime>
+#include "text.h"
 
 class Player {
 private:
-	sf::Sprite sprite;
 	sf::Texture texture;
-	float speedx = 0.f;
-	int lives = 3;
+	sf::Sprite sprite;
+	float speedx;
 	std::list<Laser*> lasers;
-	int start, end;
+	sf::Clock timer;
+	int hp, point;
+	TextObj hpText, pointText;
+	sf::FloatRect bounds;
 public:
-	Player() {
+	Player() : hpText(std::to_string(hp), sf::Vector2f{ 0.f, 0.f }), pointText(std::to_string(point), sf::Vector2f{ WINDOW_WIDTH - 200.f, 0.f })
+	{
 		texture.loadFromFile(PLAYER_FILE_NAME);
 		sprite.setTexture(texture);
-		sf::FloatRect bounds = sprite.getGlobalBounds();
-		sprite.setPosition(
-			(WINDOW_WIDTH - bounds.width) / 2,
-			WINDOW_HEIGHT - bounds.height - 50.f
-		);
+		sprite.setPosition(PLAYER_START_POS);
+		bounds = sprite.getGlobalBounds();
+		speedx = 0.f;
+		timer.restart();
+		hp = 100;
+	}
+
+	void fire() {
+		int now = timer.getElapsedTime().asMilliseconds();
+		if (now > FIRE_COOLDOWN) {
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+			{
+				sf::Vector2f pos = { sprite.getPosition().x + bounds.width / 2, sprite.getPosition().y };
+				Laser* l = new Laser(pos);
+				lasers.push_back(l);
+				timer.restart();
+			}
+		}
 	}
 
 	void update() {
@@ -32,40 +48,32 @@ public:
 			speedx = PLAYER_SPEED;
 		}
 		sprite.move(speedx, 0.f);
-
-		sf::FloatRect bounds = sprite.getGlobalBounds();
-		sf::Vector2f playerPos = sprite.getPosition();
-		if (playerPos.x < 0) {
-			sprite.setPosition(0.f, playerPos.y);
-		}
-		else if (playerPos.x > WINDOW_WIDTH - bounds.width) {
-			sprite.setPosition(WINDOW_WIDTH - bounds.width, playerPos.y);
-		}
-
-		start = clock();
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && start - end >= 500) {
-			end = clock();
-			fire();
-		}
+		fire();
 		for (auto laser : lasers) {
 			laser->update();
 		}
+		hpText.update("HP: " + std::to_string(hp));
+		pointText.update("Points: " + std::to_string(point));
 	}
 
-	//sf::Sprite getSprite() { return sprite; }
 	void draw(sf::RenderWindow& window) {
-		window.draw(sprite);
 		for (auto laser : lasers) {
 			window.draw(laser->getSprite());
 		}
+		window.draw(sprite);
+		hpText.draw(window);
+		pointText.draw(window);
 	}
 
-	int getLives() { return lives; }
-	void incLives() { lives++; }
-	void decLives() { lives--; }
+	sf::FloatRect getHitBox() { return sprite.getGlobalBounds(); }
 
-	void fire() {
-		Laser* l = new Laser(sprite.getPosition());
-		lasers.push_back(l);
-	}
+	int getHp() { return hp; }
+
+	bool isAlive() { return hp > 0; }
+
+	void receivePoint(int damage) { point += damage;}
+
+	void receiveDamage(int damage) { hp -= damage; }
+
+	std::list<Laser*>* getLasers() { return &lasers; }
 };
