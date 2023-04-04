@@ -71,7 +71,7 @@ public:
 
 	bool isAlive() { return hp > 0; }
 
-	void receivePoint(int damage) { point += damage;}
+	void receivePoint(int points) { point += points;}
 
 	void receiveDamage(int damage) { hp -= damage; }
 

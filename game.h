@@ -3,10 +3,11 @@
 #include "meteor.h"
 #include "player.h"
 #include <vector>
+#include <list>
+#include "Bonus.h"
 
 class Game {
 public:
-
 	Game() {
 		window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);
 		window.setFramerateLimit(FPS);
@@ -27,10 +28,10 @@ public:
 	}
 
 private:
-
 	sf::RenderWindow window;
 	std::vector<Meteor*> meteorSprites;
 	Player player;
+	std::list<Bonus*> bonusSprites;
 
 	void checkEvents() {
 		sf::Event event;
@@ -63,7 +64,13 @@ private:
 				{
 					meteor->spawn();
 					laser->setHit();
-					player.receivePoint(meteor->getDamage());
+					player.receivePoint(meteor->getPoint());
+					int chance = rand() % BONUS_RANGE;
+					if (chance < BONUS_CHANCE)
+					{
+						Bonus* bonus = new Bonus((Bonus::BonusType)0, meteor->getPosition);
+						bonusSprites.push_back;
+					}
 				}
 			}
 		}

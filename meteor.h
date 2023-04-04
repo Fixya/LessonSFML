@@ -6,14 +6,15 @@ private:
 	sf::Sprite sprite;
 	sf::Texture texture;
 	float speedx, speedy;
-	int damage;
-
+	int damage, point;
 public:
 	static std::string mFileNames[];
 	static int arrDamage[];
+	static int arrPoint[];
 	Meteor() {
 		int index = rand() % 4;
 		damage = arrDamage[index];
+		point = arrPoint[index];
 		texture.loadFromFile(IMAGES_FOLDER + mFileNames[index]);
 		sprite.setTexture(texture);
 		spawn();
@@ -45,8 +46,12 @@ public:
 	sf::FloatRect getHitBox() { return sprite.getGlobalBounds(); }
 
 	int getDamage() { return damage; }
+	int getPoint() { return point; }
+
+	sf::Vector2f getPosition() { return sprite.getPosition(); }
 };
 
 std::string Meteor::mFileNames[] = { "big.png", "med.png", "small.png", "tiny.png" };
 
 int Meteor::arrDamage[] = { 50,30,15,5 };
+int Meteor::arrPoint[] = { 25,15,7,2 };
