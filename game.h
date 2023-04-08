@@ -68,13 +68,20 @@ private:
 					int chance = rand() % BONUS_RANGE;
 					if (chance < BONUS_CHANCE)
 					{
-						Bonus* bonus = new Bonus((Bonus::BonusType)0, meteor->getPosition);
-						bonusSprites.push_back;
+						Bonus* bonus = new Bonus((Bonus::BonusType)0, meteor->getPosition());
+						bonusSprites.push_back(bonus);
+						sf::Vector2f posit = bonus->getPosition();
+						sf::FloatRect bonusHitBox = bonus->getHitBox();
+						if (bonusHitBox.intersects(playerBounds))
+						{
+							bonus->setDel();
+						}
 					}
 				}
 			}
 		}
 		(*laserSprites).remove_if([](Laser* laser) {return laser->isHited(); });
+		(bonusSprites).remove_if([](Bonus* bonus) {return bonus->isToDel(); });
 
 	}
 
