@@ -14,6 +14,8 @@ private:
 	int hp, point;
 	TextObj hpText, pointText;
 	sf::FloatRect bounds;
+	bool multiLaser = false;
+	bool multiHp = false;
 public:
 	Player() : hpText(std::to_string(hp), sf::Vector2f{ 0.f, 0.f }), pointText(std::to_string(point), sf::Vector2f{ WINDOW_WIDTH - 200.f, 0.f })
 	{
@@ -27,14 +29,25 @@ public:
 	}
 
 	void fire() {
-		int now = timer.getElapsedTime().asMilliseconds();
-		if (now > FIRE_COOLDOWN) {
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-			{
-				sf::Vector2f pos = { sprite.getPosition().x + bounds.width / 2, sprite.getPosition().y };
-				Laser* l = new Laser(pos);
-				lasers.push_back(l);
-				timer.restart();
+		{
+			int now = timer.getElapsedTime().asMilliseconds();
+			if (now > FIRE_COOLDOWN) {
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+				{
+					sf::Vector2f pos = { sprite.getPosition().x + bounds.width / 2, sprite.getPosition().y };
+					Laser* l = new Laser(pos);
+					lasers.push_back(l);
+					timer.restart();
+					if (multiLaser)
+					{
+						sf::Vector2f leftPos = { sprite.getPosition().x, sprite.getPosition().y + bounds.width / 2 };
+						Laser* leftL = new Laser(leftPos);
+						sf::Vector2f rightPos = { sprite.getPosition().x + bounds.width, sprite.getPosition().y + bounds.width / 2 };
+						Laser* rightL = new Laser(rightPos);
+						lasers.push_back(l);
+					}
+					timer.restart();
+				}
 			}
 		}
 	}
@@ -68,12 +81,22 @@ public:
 	sf::FloatRect getHitBox() { return sprite.getGlobalBounds(); }
 
 	int getHp() { return hp; }
-
 	bool isAlive() { return hp > 0; }
 
 	void receivePoint(int points) { point += points;}
 
 	void receiveDamage(int damage) { hp -= damage; }
 
+	void upHp()
+	{
+		hp += 50;
+		if (hp > 100) hp = 100;
+	}
+
 	std::list<Laser*>* getLasers() { return &lasers; }
+
+	bool activateMultiLaser() { multiLaser = true; }
+	bool deactivateMultiLaser() { multiLaser = false; }
+	bool activateMultiHp() { multiHp = true; }
+	bool deactivateMultiHp() { multiHp = true; }
 };

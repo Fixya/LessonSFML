@@ -21,7 +21,6 @@ public:
 		while (window.isOpen() && player.isAlive()) {
 			checkEvents();
 			update();
-			//if (player.getHp() <= 0) game_state = GAME_OVER;
 			checkCollisions();
 			draw();
 		}
@@ -49,11 +48,11 @@ private:
 	}
 
 	void checkCollisions() {
-		sf::FloatRect playerBounds = player.getHitBox();
+		sf::FloatRect playerHitBox = player.getHitBox();
 		auto laserSprites = player.getLasers();
 		for (auto& meteor : meteorSprites) {
 			sf::FloatRect meteorHitBox = meteor->getHitBox();
-			if (meteorHitBox.intersects(playerBounds)) {
+			if (meteorHitBox.intersects(playerHitBox)) {
 				meteor->spawn();
 				player.receiveDamage(meteor->getDamage());
 			}
@@ -72,20 +71,27 @@ private:
 						bonusSprites.push_back(bonus);
 						sf::Vector2f posit = bonus->getPosition();
 						sf::FloatRect bonusHitBox = bonus->getHitBox();
-						if (bonusHitBox.intersects(playerBounds))
-						{
-							bonus->setDel();
-						}
+					}
+				}
+				for (auto& bonus : bonusSprites)
+				{
+					sf::FloatRect bonusHitBox = bonus->getHitBox();
+					if (bonusHitBox.intersects(playerHitBox))
+					{
+						bonus->act(player);
+						bonus->setDel();
 					}
 				}
 			}
+			(*laserSprites).remove_if([](Laser* laser) {return laser->isHited(); });
+			(*laserSprites).remove_if([](Laser* laser) {return laser->offScreen(); });
+			bonusSprites.remove_if([](Bonus* bonus) {return bonus->isToDel(); });
+			bonusSprites.remove_if([](Bonus* bonus) {return bonus->offScreen(); });
 		}
-		(*laserSprites).remove_if([](Laser* laser) {return laser->isHited(); });
-		(bonusSprites).remove_if([](Bonus* bonus) {return bonus->isToDel(); });
-
 	}
 
-	void draw() {
+	void draw() 
+	{
 		window.clear();
 		for (auto meteor : meteorSprites) {
 			window.draw(meteor->getSprite());
