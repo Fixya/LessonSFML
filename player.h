@@ -6,16 +6,17 @@
 
 class Player {
 private:
-	sf::Texture texture;
 	sf::Sprite sprite;
-	float speedx;
+	sf::Texture texture;
+	float speedx = 0.f;
 	std::list<Laser*> lasers;
 	sf::Clock timer;
 	int hp, point;
 	TextObj hpText, pointText;
 	sf::FloatRect bounds;
 	bool multiLaser = false;
-	bool multiHp = false;
+	bool Hp = false;
+	bool shield = false;
 public:
 	Player() : hpText(std::to_string(hp), sf::Vector2f{ 0.f, 0.f }), pointText(std::to_string(point), sf::Vector2f{ WINDOW_WIDTH - 200.f, 0.f })
 	{
@@ -23,7 +24,6 @@ public:
 		sprite.setTexture(texture);
 		sprite.setPosition(PLAYER_START_POS);
 		bounds = sprite.getGlobalBounds();
-		speedx = 0.f;
 		timer.restart();
 		hp = 100;
 	}
@@ -37,14 +37,14 @@ public:
 					sf::Vector2f pos = { sprite.getPosition().x + bounds.width / 2, sprite.getPosition().y };
 					Laser* l = new Laser(pos);
 					lasers.push_back(l);
-					timer.restart();
 					if (multiLaser)
 					{
 						sf::Vector2f leftPos = { sprite.getPosition().x, sprite.getPosition().y + bounds.width / 2 };
 						Laser* leftL = new Laser(leftPos);
+						lasers.push_back(leftL);
 						sf::Vector2f rightPos = { sprite.getPosition().x + bounds.width, sprite.getPosition().y + bounds.width / 2 };
 						Laser* rightL = new Laser(rightPos);
-						lasers.push_back(l);
+						lasers.push_back(rightL);
 					}
 					timer.restart();
 				}
@@ -65,8 +65,20 @@ public:
 		for (auto laser : lasers) {
 			laser->update();
 		}
+		if (Hp) {
+			hp += 50;
+			if (hp > 100) hp = 100;
+			deactivateHp();
+		}
 		hpText.update("HP: " + std::to_string(hp));
 		pointText.update("Points: " + std::to_string(point));
+		/*if (multiLaser) {
+			int now1 = timer.getElapsedTime().asMilliseconds();
+			if (now1 > BONUS_USING) {
+				deactivateMultiLaser();
+				timer.restart();
+			}
+		}*/
 	}
 
 	void draw(sf::RenderWindow& window) {
@@ -87,16 +99,12 @@ public:
 
 	void receiveDamage(int damage) { hp -= damage; }
 
-	void upHp()
-	{
-		hp += 50;
-		if (hp > 100) hp = 100;
-	}
-
 	std::list<Laser*>* getLasers() { return &lasers; }
 
-	bool activateMultiLaser() { multiLaser = true; }
-	bool deactivateMultiLaser() { multiLaser = false; }
-	bool activateMultiHp() { multiHp = true; }
-	bool deactivateMultiHp() { multiHp = true; }
+	void activateMultiLaser() { multiLaser = true; }
+	void deactivateMultiLaser() { multiLaser = false; }
+	void activateHp() { Hp = true; }
+	void deactivateHp() { Hp = false; }
+	void activateShield() { shield = true; }
+	void deactivateShield() { shield = false; }
 };

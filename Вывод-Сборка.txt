@@ -1,0 +1,11 @@
+﻿1>------ Сборка начата: проект: SFML_TEMPLATE10, Конфигурация: Debug x64 ------
+1>main.cpp
+1>D:\NastyaKr\SFML_TEMPLATE10\meteor.h(25,11): warning C4244: инициализация: преобразование "int" в "float", возможна потеря данных
+1>D:\NastyaKr\SFML_TEMPLATE10\meteor.h(29,23): warning C4244: =: преобразование "int" в "float", возможна потеря данных
+1>D:\NastyaKr\SFML_TEMPLATE10\meteor.h(30,23): warning C4244: =: преобразование "int" в "float", возможна потеря данных
+1>D:\NastyaKr\SFML_TEMPLATE10\game.h(12,45): warning C4244: аргумент: преобразование "const float" в "unsigned int", возможна потеря данных
+1>D:\NastyaKr\SFML_TEMPLATE10\game.h(12,31): warning C4244: аргумент: преобразование "const float" в "unsigned int", возможна потеря данных
+1>D:\NastyaKr\SFML_TEMPLATE10\game.h(13,28): warning C4244: аргумент: преобразование "const float" в "unsigned int", возможна потеря данных
+1>SFML_TEMPLATE10.vcxproj -> D:\NastyaKr\SFML_TEMPLATE10\x64\Debug\SFML_TEMPLATE10.exe
+1>Сборка проекта "SFML_TEMPLATE10.vcxproj" завершена.
+========== Сборка: успешно: 1, с ошибками: 0, без изменений: 0, пропущено: 0 ==========

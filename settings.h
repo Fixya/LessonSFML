@@ -25,10 +25,11 @@ const sf::Color RECT_COLOR{ sf::Color(0, 0, 0) };
 const sf::Vector2f RECT_POS{ 0, 0 };
 
 const int FIRE_COOLDOWN = 200;
+const int BONUS_USING = 20;
 
 const std::string MULTI_LASER_BONUS_FILE_NAME = "things_silver.png";
 const std::string HP_UP_BONUS_FILE_NAME = "pill_green.png";
 const std::string SHIELD_UP_BONUS_FILE_NAME = "shield_silver.png";
 const float BONUS_SPEED = 10.f;
-const int BONUS_RANGE = 10000;
-const int BONUS_CHANCE = 500;
+const int BONUS_RANGE = 100;
+const int BONUS_CHANCE = 50;

@@ -3,10 +3,10 @@
 
 class Bonus {
 public:
-	enum BonusType { MULTI_LASER, HP, SHIELD};
+	enum BonusType { MULTI_LASER, HP, SHIELD, BONUSES_TYPE_QTY };
 	Bonus(BonusType type, sf::Vector2f position);
 	void update();
-	void draw(sf::RenderWindow window);
+	void draw(sf::RenderWindow& window);
 	sf::FloatRect getHitBox();
 	sf::Vector2f getPosition();
 	void setDel();
@@ -43,10 +43,15 @@ Bonus::Bonus(BonusType type, sf::Vector2f position)
 		break;
 	}
 }
+
 void Bonus::update() { sprite.move(0.f, BONUS_SPEED); }
-void Bonus::draw(sf::RenderWindow window) { window.draw(sprite); }
+
+void Bonus::draw(sf::RenderWindow& window) { window.draw(sprite); }
+
 sf::FloatRect Bonus::getHitBox() { return sprite.getGlobalBounds(); }
+
 sf::Vector2f Bonus::getPosition() { return sprite.getPosition(); }
+
 bool Bonus::isToDel() { return del; }
 void Bonus::setDel() { del = true; }
 bool Bonus::offScreen() {
@@ -61,7 +66,10 @@ void Bonus::act(Player& player)
 		player.activateMultiLaser();
 		break;
 	case HP:
-		player.activateMultiLaser();
+		player.activateHp();
+		break;
+	case SHIELD:
+		player.activateShield();
 		break;
 	}
 }

@@ -44,6 +44,9 @@ private:
 		for (auto meteor : meteorSprites) {
 			meteor->update();
 		}
+		for (auto& bonus : bonusSprites) {
+			bonus->update();
+		}
 		player.update();
 	}
 
@@ -65,9 +68,10 @@ private:
 					laser->setHit();
 					player.receivePoint(meteor->getPoint());
 					int chance = rand() % BONUS_RANGE;
+					size_t bonusType = rand() % Bonus::BonusType::BONUSES_TYPE_QTY;
 					if (chance < BONUS_CHANCE)
 					{
-						Bonus* bonus = new Bonus((Bonus::BonusType)0, meteor->getPosition());
+						Bonus* bonus = new Bonus((Bonus::BonusType)bonusType, meteor->getPosition());
 						bonusSprites.push_back(bonus);
 						sf::Vector2f posit = bonus->getPosition();
 						sf::FloatRect bonusHitBox = bonus->getHitBox();
@@ -93,10 +97,13 @@ private:
 	void draw() 
 	{
 		window.clear();
-		for (auto meteor : meteorSprites) {
-			window.draw(meteor->getSprite());
+		for (auto m : meteorSprites) {
+			window.draw(m->getSprite());
 		}
 		player.draw(window);
+		for (auto& bonus : bonusSprites) {
+			bonus->draw(window);
+		}
 		window.display();
 	}
 };
