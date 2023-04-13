@@ -15,7 +15,6 @@ public:
 		sprite.setOrigin(bounds.width / 2, bounds.height / 2);
 		sprite.setPosition(pos);
 		speedy = -15.f;
-		//hit = false;
 	}
 
 	void update() {

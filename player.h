@@ -17,6 +17,7 @@ private:
 	bool multiLaser = false;
 	bool Hp = false;
 	bool shield = false;
+	int counter;
 public:
 	Player() : hpText(std::to_string(hp), sf::Vector2f{ 0.f, 0.f }), pointText(std::to_string(point), sf::Vector2f{ WINDOW_WIDTH - 200.f, 0.f })
 	{
@@ -26,6 +27,7 @@ public:
 		bounds = sprite.getGlobalBounds();
 		timer.restart();
 		hp = 100;
+		counter = 0;
 	}
 
 	void fire() {
@@ -45,6 +47,7 @@ public:
 						sf::Vector2f rightPos = { sprite.getPosition().x + bounds.width, sprite.getPosition().y + bounds.width / 2 };
 						Laser* rightL = new Laser(rightPos);
 						lasers.push_back(rightL);
+						counter++;
 					}
 					timer.restart();
 				}
@@ -72,13 +75,14 @@ public:
 		}
 		hpText.update("HP: " + std::to_string(hp));
 		pointText.update("Points: " + std::to_string(point));
-		/*if (multiLaser) {
-			int now1 = timer.getElapsedTime().asMilliseconds();
-			if (now1 > BONUS_USING) {
-				deactivateMultiLaser();
-				timer.restart();
-			}
-		}*/
+		if (counter >= 20) {
+			counter = 0;
+			deactivateMultiLaser();
+		}
+		if (shield)
+		{
+			bonus.effect(sprite.getPosition());
+		}
 	}
 
 	void draw(sf::RenderWindow& window) {
@@ -95,7 +99,7 @@ public:
 	int getHp() { return hp; }
 	bool isAlive() { return hp > 0; }
 
-	void receivePoint(int points) { point += points;}
+	void receivePoint(int points) { point += points; }
 
 	void receiveDamage(int damage) { hp -= damage; }
 

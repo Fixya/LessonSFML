@@ -4,7 +4,7 @@
 #include "player.h"
 #include <vector>
 #include <list>
-#include "Bonus.h"
+#include "bonus.h"
 
 class Game {
 public:
@@ -94,7 +94,7 @@ private:
 		}
 	}
 
-	void draw() 
+	void draw()
 	{
 		window.clear();
 		for (auto m : meteorSprites) {
