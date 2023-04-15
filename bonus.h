@@ -47,12 +47,12 @@ Bonus::Bonus(BonusType type, sf::Vector2f position)
 
 void Bonus::update() { sprite.move(0.f, BONUS_SPEED); }
 
-void Bonus::effect(sf::Vector2f position)
+/*void Bonus::effect(sf::Vector2f position)
 {
 	texture.loadFromFile(SHIELD_EFFECT_BONUS_FILE_NAME);
 	sprite.setTexture(texture);
 	sprite.setPosition(position);
-}
+}*/
 
 void Bonus::draw(sf::RenderWindow& window) { window.draw(sprite); }
 

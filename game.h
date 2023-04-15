@@ -86,6 +86,14 @@ private:
 						bonus->setDel();
 					}
 				}
+				for (auto& bonus : bonusSprites)
+				{
+					sf::FloatRect shieldHitBox = bonus->getHitBox();
+					if (shieldHitBox.intersects(meteorHitBox))
+					{
+						meteor->spawn();
+					}
+				}
 			}
 			(*laserSprites).remove_if([](Laser* laser) {return laser->isHited(); });
 			(*laserSprites).remove_if([](Laser* laser) {return laser->offScreen(); });

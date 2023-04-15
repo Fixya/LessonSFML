@@ -3,6 +3,7 @@
 #include "settings.h"
 #include "laser.h"
 #include "text.h"
+#include "shield.h"
 
 class Player {
 private:
@@ -28,6 +29,7 @@ public:
 		timer.restart();
 		hp = 100;
 		counter = 0;
+		Shield::Shield(sprite.getPosition());
 	}
 
 	void fire() {
@@ -81,7 +83,7 @@ public:
 		}
 		if (shield)
 		{
-			bonus.effect(sprite.getPosition());
+			//shield->update(sprite.getPosition());
 		}
 	}
 
