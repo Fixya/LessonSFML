@@ -22,4 +22,5 @@ public:
 	void draw(sf::RenderWindow& window) {
 		window.draw(text);
 	}
+
 };

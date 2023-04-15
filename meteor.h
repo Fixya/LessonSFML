@@ -54,4 +54,4 @@ public:
 std::string Meteor::mFileNames[] = { "big.png", "med.png", "small.png", "tiny.png" };
 
 int Meteor::arrDamage[] = { 50,30,15,5 };
-int Meteor::arrPoint[] = { 25,15,7,2 };
+int Meteor::arrPoint[] = { 15,10,5,1 };

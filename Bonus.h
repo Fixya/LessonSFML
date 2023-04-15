@@ -13,6 +13,7 @@ public:
 	bool isToDel();
 	bool offScreen();
 	void act(Player& player);
+	void effect(sf::Vector2f position);
 private:
 	sf::Sprite sprite;
 	sf::Texture texture;

@@ -17,10 +17,11 @@ private:
 	sf::FloatRect bounds;
 	bool multiLaser = false;
 	bool Hp = false;
-	bool shield = false;
 	int counter;
+	Shield shield;
 public:
-	Player() : hpText(std::to_string(hp), sf::Vector2f{ 0.f, 0.f }), pointText(std::to_string(point), sf::Vector2f{ WINDOW_WIDTH - 200.f, 0.f })
+	Player() : hpText(std::to_string(hp), sf::Vector2f{ 0.f, 0.f }), pointText(std::to_string(point), sf::Vector2f{ WINDOW_WIDTH - 200.f, 0.f }),
+		shield(getCenterPosition())
 	{
 		texture.loadFromFile(PLAYER_FILE_NAME);
 		sprite.setTexture(texture);
@@ -29,7 +30,6 @@ public:
 		timer.restart();
 		hp = 100;
 		counter = 0;
-		Shield::Shield(sprite.getPosition());
 	}
 
 	void fire() {
@@ -58,6 +58,7 @@ public:
 	}
 
 	void update() {
+		bounds = sprite.getLocalBounds();
 		speedx = 0.f;
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
 			speedx = -PLAYER_SPEED;
@@ -81,19 +82,22 @@ public:
 			counter = 0;
 			deactivateMultiLaser();
 		}
-		if (shield)
-		{
-			//shield->update(sprite.getPosition());
-		}
+
+		shield.setPosition(getCenterPosition());
 	}
 
 	void draw(sf::RenderWindow& window) {
+		if (shield.isActive())
+		{
+			shield.draw(window);
+		}
 		for (auto laser : lasers) {
 			window.draw(laser->getSprite());
 		}
 		window.draw(sprite);
 		hpText.draw(window);
 		pointText.draw(window);
+		
 	}
 
 	sf::FloatRect getHitBox() { return sprite.getGlobalBounds(); }
@@ -111,6 +115,14 @@ public:
 	void deactivateMultiLaser() { multiLaser = false; }
 	void activateHp() { Hp = true; }
 	void deactivateHp() { Hp = false; }
-	void activateShield() { shield = true; }
-	void deactivateShield() { shield = false; }
+	void activateShield() { shield.activate; }
+	//void deactivateShield() { shield.deactivate; }
+
+	sf::Vector2f getCenterPosition();
 };
+
+sf::Vector2f Player::getCenterPosition()
+{
+	return sf::Vector2f{ bounds.left + bounds.width / 2,  bounds.top + bounds.height / 2 };
+}
+//не пропускал метеориты и исчезал со временем
