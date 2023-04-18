@@ -6,29 +6,13 @@ class Shield
 public:
 	Shield(sf::Vector2f centerPosition);
 	void draw(sf::RenderWindow& window);
-	void activate();
-	bool isActive();
-	void deactivate();
 	void setPosition(sf::Vector2f centerPosition);
+	sf::FloatRect getHitBox();
 private:
 	sf::Sprite sprite;
 	sf::Texture texture;
 	sf::Clock timer;
 	bool active = false;
-	
-	/*Shield()
-	{
-		texture.loadFromFile(SHIELD_EFFECT_BONUS_FILE_NAME);
-		sprite.setTexture(texture);
-	}
-	void update(sf::Vector2f position) { sprite.setPosition(position); }
-
-	void draw(sf::RenderWindow& window) {
-		window.draw(sprite);
-	}
-
-	sf::FloatRect getHitBox() { return sprite.getGlobalBounds(); }*/
-	
 };
 Shield::Shield(sf::Vector2f position)
 {
@@ -40,7 +24,6 @@ Shield::Shield(sf::Vector2f position)
 }
 void Shield::draw(sf::RenderWindow& window) { window.draw(sprite); }
 
-void Shield::activate() { active = true; }
-bool Shield::isActive() { return active; }
-void Shield::deactivate() { active = false; }
 void Shield::setPosition(sf::Vector2f pos) { sprite.setPosition(pos); }
+
+sf::FloatRect Shield::getHitBox() { return sprite.getGlobalBounds(); }

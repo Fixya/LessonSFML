@@ -25,7 +25,9 @@ const sf::Color RECT_COLOR{ sf::Color(0, 0, 0) };
 const sf::Vector2f RECT_POS{ 0, 0 };
 
 const int FIRE_COOLDOWN = 200;
+const size_t MULTI_LASER_BONUS_DURATION = 5000;
 const int BONUS_USING = 20;
+const size_t SHIELD_MARGIN = 10;
 
 const std::string MULTI_LASER_BONUS_FILE_NAME = "things_silver.png";
 const std::string HP_UP_BONUS_FILE_NAME = "pill_green.png";

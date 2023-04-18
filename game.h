@@ -51,11 +51,18 @@ private:
 	}
 
 	void checkCollisions() {
+		sf::FloatRect shieldHitBox = player.getShieldHitBox();
 		sf::FloatRect playerHitBox = player.getHitBox();
 		auto laserSprites = player.getLasers();
 		for (auto& meteor : meteorSprites) {
 			sf::FloatRect meteorHitBox = meteor->getHitBox();
-			if (meteorHitBox.intersects(playerHitBox)) {
+			if (player.shieldIsActive())
+			{
+				if (meteorHitBox.intersects(shieldHitBox)) {
+					meteor->spawn();
+					player.decreaseShieldMargin();
+				}
+			}else if (meteorHitBox.intersects(playerHitBox)) {
 				meteor->spawn();
 				player.receiveDamage(meteor->getDamage());
 			}
@@ -87,11 +94,6 @@ private:
 					}
 				}
 			}
-			/*sf::FloatRect shieldHitBox = shield.getHitBox();
-			if (meteorHitBox.intersects(shieldHitBox))
-			{
-				meteor->spawn();
-			}*/
 			(*laserSprites).remove_if([](Laser* laser) {return laser->isHited(); });
 			(*laserSprites).remove_if([](Laser* laser) {return laser->offScreen(); });
 			bonusSprites.remove_if([](Bonus* bonus) {return bonus->isToDel(); });
