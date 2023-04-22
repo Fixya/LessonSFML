@@ -35,4 +35,4 @@ const std::string SHIELD_UP_BONUS_FILE_NAME = "shield_silver.png";
 const std::string SHIELD_EFFECT_BONUS_FILE_NAME = "shield2.png";
 const float BONUS_SPEED = 10.f;
 const int BONUS_RANGE = 10000;
-const int BONUS_CHANCE = 2500;
+const int BONUS_CHANCE = 1000;

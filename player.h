@@ -22,12 +22,14 @@ public:
 	void activateHp();
 	void deactivateHp();
 	void activateShield();
-	//void deactivateShield();
 	sf::Vector2f getCenterPosition();
 	bool shieldIsActive() { return shieldActive; }
 	void deactivateShield() { shieldActive = false; }
 	void decreaseShieldMargin();
 	sf::FloatRect getShieldHitBox();
+	void checkBonuses();
+	void playerControl();
+	void updateShield();
 private:
 	sf::Sprite sprite;
 	sf::Texture texture;
@@ -43,11 +45,10 @@ private:
 	Shield shield;
 	bool shieldActive = false;
 	int currTime, prevFireTime;
-	int prevMultiLaserBonusTime; //,currMultiLaserBonusTime;
-	int prevShieldTime; //currShieldTime;
+	int prevMultiLaserBonusTime;
+	int prevShieldTime;
 	int shieldMargin = SHIELD_MARGIN;
 };
-//не пропускал метеориты и исчезал со временем
 
 Player::Player() : hpText(std::to_string(hp), sf::Vector2f{ 0.f, 0.f }), pointText(std::to_string(point), sf::Vector2f{ WINDOW_WIDTH - 200.f, 0.f }),
 shield(getCenterPosition())
@@ -61,19 +62,9 @@ shield(getCenterPosition())
 }
 
 void Player::update() {
-	currTime = timer.getElapsedTime().asMilliseconds();
-	if (currTime - prevMultiLaserBonusTime > MULTI_LASER_BONUS_DURATION) multiLaser = false;
-	if (shieldMargin <= 0) multiLaser = shieldActive;
+	checkBonuses();
+	playerControl();
 
-	bounds = sprite.getLocalBounds();
-	speedx = 0.f;
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-		speedx = -PLAYER_SPEED;
-	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-		speedx = PLAYER_SPEED;
-	}
-	sprite.move(speedx, 0.f);
 	fire();
 	for (auto laser : lasers) {
 		laser->update();
@@ -85,14 +76,7 @@ void Player::update() {
 	}
 	hpText.update("HP: " + std::to_string(hp));
 	pointText.update("Points: " + std::to_string(point));
-	if (counter >= 20) {
-		counter = 0;
-		deactivateMultiLaser();
-	}
-	if (shieldIsActive()) {
-		shield.setPosition(getCenterPosition());
-	}else
-		shield.setPosition(sf::Vector2f{ WINDOW_WIDTH/2, WINDOW_HEIGHT + 100.f });
+	updateShield();
 }
 
 void Player::draw(sf::RenderWindow& window) {
@@ -138,16 +122,14 @@ bool Player::isAlive() { return hp > 0; }
 void Player::receivePoint(int points) { point += points; }
 void Player::receiveDamage(int damage) { hp -= damage; }
 std::list<Laser*>* Player::getLasers() { return &lasers; }
-void Player::activateMultiLaser() 
-{ 
+void Player::activateMultiLaser() { 
 	multiLaser = true;
 	prevMultiLaserBonusTime = timer.getElapsedTime().asMilliseconds();
 }
 void Player::deactivateMultiLaser() { multiLaser = false; }
 void Player::activateHp() { Hp = true; }
 void Player::deactivateHp() { Hp = false; }
-void Player::activateShield()
-{ 
+void Player::activateShield() { 
 	shieldActive = true;
 	shieldMargin = SHIELD_MARGIN;
 	prevShieldTime = timer.getElapsedTime().asMilliseconds();
@@ -155,3 +137,28 @@ void Player::activateShield()
 void Player::decreaseShieldMargin() { shieldMargin--; }
 sf::Vector2f Player::getCenterPosition() { return sf::Vector2f{ sprite.getPosition().x + bounds.width / 2, sprite.getPosition().y + bounds.height / 2 }; }
 sf::FloatRect Player::getShieldHitBox() { return shield.getHitBox(); }
+
+void Player::checkBonuses() {
+	currTime = timer.getElapsedTime().asMilliseconds();
+	if (currTime - prevMultiLaserBonusTime > MULTI_LASER_BONUS_DURATION) multiLaser = false;
+	if (shieldMargin <= 0) shieldActive = false;
+}
+
+void Player::playerControl() {
+	bounds = sprite.getLocalBounds();
+	speedx = 0.f;
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+		speedx = -PLAYER_SPEED;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+		speedx = PLAYER_SPEED;
+	}
+	sprite.move(speedx, 0.f);
+}
+
+void Player::updateShield() {
+	if (shieldIsActive()) 
+		{ shield.setPosition(getCenterPosition()); }
+	else
+		shield.setPosition(sf::Vector2f{ WINDOW_WIDTH / 2, WINDOW_HEIGHT + 100.f });
+}
