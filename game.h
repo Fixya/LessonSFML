@@ -1,24 +1,38 @@
-﻿#pragma once
+#pragma once
 #include "settings.h"
-#include "meteor.h"
 #include "player.h"
-#include <vector>
 #include <list>
-#include "bonus.h"
+#include "unit.h"
+#include "Text.h"
+#include "mark.h"
+#include "ban_mark.h"
+
 
 class Game {
 public:
-	Game() {
+	Game() : text_player_go("Player 1", sf::Vector2f{ 0.f, 0.f }), text_player_unit("walking units", sf::Vector2f{ 175.f, 0.f }),
+		text_point("points", sf::Vector2f{ 800.f, 0.f }), text_int_point(std::to_string(point), sf::Vector2f{ 920.f, 0.f }),
+		text_for_ban("u can do", sf::Vector2f{ 20.f, 460.f })
+	{
 		window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);
 		window.setFramerateLimit(FPS);
-		meteorSprites.reserve(METEORS_QTY);
-		for (int i = 0; i < METEORS_QTY; i++) {
-			meteorSprites.push_back(new Meteor());
+		for (int i = 0; i < 6; i++) {
+			Player* pw1 = new Player(PLAYER_FILE_NAME, sf::Vector2f{ 90.f, float(80 + 65 * i) });
+			playerWhiteSprites.push_back(pw1);
+			Player* pb1 = new Player(PLAYER1_FILE_NAME, sf::Vector2f{ 900.f, float(80 + 65 * i) });
+			playerBlackSprites.push_back(pb1);
+			Units* uw1 = new Units((Units::UnitType)0, sf::Vector2f{ 170.f, float(75 + 65 * i) });
+			unitWhiteSprites.push_back(uw1);
+			Units* ub1 = new Units((Units::UnitType)1, sf::Vector2f{ 800.f, float(75 + 65 * i) });
+			unitBlackSprites.push_back(ub1);
 		}
+		Ban_mark* bu1 = new Ban_mark(sf::Vector2f{ -100.f, -100.f });
+		banMark.push_back(bu1);
+		timer.restart();
 	}
 
 	void play() {
-		while (window.isOpen() && player.isAlive()) {
+		while (window.isOpen()) {
 			checkEvents();
 			update();
 			checkCollisions();
@@ -26,15 +40,31 @@ public:
 		}
 	}
 
-	void checkCollBonus(Bonus* bonus, sf::FloatRect playerHitBox);
-	void checkCollLBonus(Meteor* meteor);
-	void checkCollShield(Meteor* meteor, sf::FloatRect meteorHitBox, sf::FloatRect shieldHitBox, sf::FloatRect playerHitBox);
-	void checkCollLaser(Meteor* meteor, Laser* laser, sf::FloatRect meteorHitBox, sf::FloatRect playerHitBox, sf::FloatRect laserHitBox, std::list<Laser*>(*laserSprites));
+	void land();
+	void banUnits(Units* unit);
+	void playerWhiteUpdate(Player* player);
+	void playerBlackUpdate(Player* player);
+	void unitWhiteUpdate(Units* unitW);
+	void unitBlackUpdate(Units* unitB);
+	void playerUnit(sf::RenderWindow& window);
+	void allText(sf::RenderWindow& window);
 private:
 	sf::RenderWindow window;
-	std::vector<Meteor*> meteorSprites;
-	Player player;
-	std::list<Bonus*> bonusSprites;
+	sf::RectangleShape block[COL_LINE][COL_ROW];
+	std::list<Player*> playerWhiteSprites;
+	std::list<Player*> playerBlackSprites;
+	int qtyWhite = 1, qtyBlack = 1;
+	std::list<Units*> unitWhiteSprites;
+	std::list<Units*> unitBlackSprites;
+	int turn, alternate, permission;
+	TextObj text_player_go, text_player_unit;
+	TextObj text_point, text_int_point;
+	int point, point1;
+	TextObj text_for_ban;
+	Mark mark;
+	std::list<Ban_mark*> banMark;
+	sf::Clock timer;
+	int currTime, prevTimeBlack, prevTimeWhite;
 
 	void checkEvents() {
 		sf::Event event;
@@ -45,93 +75,230 @@ private:
 	}
 
 	void update() {
-		for (auto meteor : meteorSprites) {
-			meteor->update();
+		currTime = timer.getElapsedTime().asMilliseconds();
+		land();
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2) && turn == 0) { 
+			turn = 1;
+			point1 += 10;
+			for (auto banMarks : banMark)
+				banMarks->setDel();
 		}
-		for (auto& bonus : bonusSprites) {
-			bonus->update();
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1) && turn == 1) { 
+			turn = 0;
+			point += 10;
+			text_int_point.update(std::to_string(point));
+			for (auto banMarks : banMark)
+				banMarks->setDel();
 		}
-		player.update();
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) {
+			alternate = 0;
+			text_player_unit.update("walking units");
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::X)) {
+			alternate = 1;
+			text_player_unit.update("Creation of units");
+		}
+		if (turn == 0) {
+			for (auto player : playerWhiteSprites) {
+				player->update();
+				text_player_go.update("Player 1");
+			}
+		}
+		if (turn == 1) {
+			for (auto player : playerBlackSprites) {
+				player->update();
+				text_player_go.update("Player 2");
+			}
+		}
+		if (permission == 0) text_for_ban.update("u can do");
+		if (permission == 1) text_for_ban.update("u can't do");
+		if (turn == 0)text_int_point.update(std::to_string(point));
+		if (turn == 1)text_int_point.update(std::to_string(point1));
+		mark.update(currTime);
 	}
 
 	void checkCollisions() {
-		sf::FloatRect shieldHitBox = player.getShieldHitBox();
-		sf::FloatRect playerHitBox = player.getHitBox();
-		auto laserSprites = player.getLasers();
-		for (auto& meteor : meteorSprites) {
-			sf::FloatRect meteorHitBox = meteor->getHitBox();
-			checkCollShield(meteor, meteorHitBox, shieldHitBox, playerHitBox);
-			for (auto& laser : (*laserSprites))
+		sf::FloatRect markHitBox = mark.getHitBox();
+		for (auto banMarks : banMark) {
+			sf::FloatRect banMarkHitBox = banMarks->getHitBox();
+			if (markHitBox.intersects(banMarkHitBox)) { permission = 1; }
+			else { permission = 0; }
+		}
+		for (auto playerW : playerWhiteSprites) {
+			sf::FloatRect playerWhiteHitBox = playerW->getHitBox();
+			if (markHitBox.intersects(playerWhiteHitBox) && turn == 0 && permission == 0)
 			{
-				sf::FloatRect laserHitBox = laser->getHitBox();
-				checkCollLaser(meteor, laser, meteorHitBox, playerHitBox, laserHitBox, laserSprites);
+				playerWhiteUpdate(playerW);
+			}
+			for (auto playerB : playerBlackSprites)
+			{
+				sf::FloatRect playerBlackHitBox = playerB->getHitBox();
+				if (markHitBox.intersects(playerBlackHitBox) && turn == 1 && permission == 0)
+				{
+					playerBlackUpdate(playerB);
+				}
+				for (auto unitW : unitWhiteSprites)
+				{
+					sf::FloatRect unitWhiteHitBox = unitW->getHitBox();
+					for (auto unitB : unitBlackSprites)
+					{
+						sf::FloatRect unitBlackHitBox = unitB->getHitBox();
+						if (unitWhiteHitBox.intersects(unitBlackHitBox))
+						{
+							if (turn == 0) { unitB->setDel(); point += 1; }
+							if (turn == 1) { unitW->setDel(); point1 += 1; }
+						}
+						if (markHitBox.intersects(unitBlackHitBox) && turn == 1 && permission == 0)
+						{
+							unitBlackUpdate(unitB);
+						}
+					}
+					if (markHitBox.intersects(unitWhiteHitBox) && turn == 0 && permission == 0)
+					{
+						unitWhiteUpdate(unitW);
+					}
+				}
 			}
 		}
-		(*laserSprites).remove_if([](Laser* laser) {return laser->isHited(); });
-		(*laserSprites).remove_if([](Laser* laser) {return laser->offScreen(); });
-		bonusSprites.remove_if([](Bonus* bonus) {return bonus->isToDel(); });
-		bonusSprites.remove_if([](Bonus* bonus) {return bonus->offScreen(); });
+		unitWhiteSprites.remove_if([](Units* unitW) {return unitW->isToDel(); });
+		unitBlackSprites.remove_if([](Units* unitB) {return unitB->isToDel(); });
+		banMark.remove_if([](Ban_mark* banMarks) {return banMarks->isToDel(); });
 	}
 
-	void draw()
-	{
+	void draw() {
 		window.clear();
-		for (auto m : meteorSprites) {
-			window.draw(m->getSprite());
+		for (int j = 0; j < COL_ROW; j++) {
+			for (int i = 0; i < COL_LINE; i++)
+				window.draw(block[i][j]);
 		}
-		player.draw(window);
-		for (auto& bonus : bonusSprites) {
-			bonus->draw(window);
-		}
+		playerUnit(window);
+		allText(window);
 		window.display();
 	}
 };
 
-void Game::checkCollBonus(Bonus* bonus, sf::FloatRect playerHitBox) {
-	sf::FloatRect bonusHitBox = bonus->getHitBox();
-	if (bonusHitBox.intersects(playerHitBox))
+void Game::land()
+{
+	for (int j = 0; j < COL_ROW; j++)
 	{
-		bonus->act(player);
-		bonus->setDel();
-	}
-}
-
-void Game::checkCollLBonus(Meteor* meteor) {
-	int chance = rand() % BONUS_RANGE;
-	size_t bonusType = rand() % Bonus::BonusType::BONUSES_TYPE_QTY;
-	if (chance < BONUS_CHANCE)
-	{
-		Bonus* bonus = new Bonus((Bonus::BonusType)bonusType, meteor->getPosition());
-		bonusSprites.push_back(bonus);
-		sf::Vector2f posit = bonus->getPosition();
-		sf::FloatRect bonusHitBox = bonus->getHitBox();
-	}
-}
-
-void Game::checkCollLaser(Meteor* meteor, Laser* laser, sf::FloatRect meteorHitBox, sf::FloatRect playerHitBox, sf::FloatRect laserHitBox, std::list<Laser*> (*laserSprites)) {
-	if (laserHitBox.intersects(meteorHitBox))
-	{
-		meteor->spawn();
-		laser->setHit();
-		player.receivePoint(meteor->getPoint());
-		checkCollLBonus(meteor);
-	}
-	for (auto& bonus : bonusSprites)
-	{
-		checkCollBonus(bonus, playerHitBox);
-	}
-}
-
-void Game::checkCollShield(Meteor* meteor, sf::FloatRect meteorHitBox, sf::FloatRect shieldHitBox, sf::FloatRect playerHitBox) {
-	if (player.shieldIsActive())
-	{
-		if (meteorHitBox.intersects(shieldHitBox)) {
-			meteor->spawn();
-			player.decreaseShieldMargin();
+		for (int i = 0; i < COL_LINE; i++)
+		{
+			block[i][j].setSize(sf::Vector2f{ BLOCK_WIDTH, BLOCK_HEIGHT });
+			block[i][j].setFillColor(BLOCK_COLOR);
+			block[i][j].setPosition(50 + (BLOCK_WIDTH + 5) * i, BLOCK_HEIGHT + (BLOCK_HEIGHT + 5) * j);
 		}
 	}
-	else if (meteorHitBox.intersects(playerHitBox)) {
-		meteor->spawn();
-		player.receiveDamage(meteor->getDamage());
+}
+
+void Game::banUnits(Units* unit) {
+	Ban_mark* bu2 = new Ban_mark(unit->getPosition() + sf::Vector2f{ 5.f, -10.f });
+	banMark.push_back(bu2);
+}
+
+void Game::playerWhiteUpdate(Player* player) {
+	if (alternate == 1 && point >= 15) {
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+			Units* uw2 = new Units((Units::UnitType)0, (player->getPosition() + sf::Vector2f{ 80.f, -5.f }));
+			unitWhiteSprites.push_back(uw2);
+			point -= 15;
+		}
 	}
+}
+
+void Game::playerBlackUpdate(Player* player) {
+	if (alternate == 1 && point1 >= 15) {
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+			Units* ub2 = new Units((Units::UnitType)1, (player->getPosition() - sf::Vector2f{ 100.f, 5.f }));
+			unitBlackSprites.push_back(ub2);
+			point1 -= 15;
+		}
+	}
+}
+
+void Game::unitWhiteUpdate(Units* unitW) {
+	if (alternate == 0) {
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && currTime - prevTimeWhite > INTERVAL_TIME) {
+			if (unitW->getPositionY() > 135) {
+				unitW->setPosition(unitW->getPosition() - sf::Vector2f{ 0.f, 65.f });
+				prevTimeWhite = currTime;
+				banUnits(unitW);
+			}
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && currTime - prevTimeWhite > INTERVAL_TIME) {
+			if (unitW->getPositionY() < 380) {
+				unitW->setPosition(unitW->getPosition() + sf::Vector2f{ 0.f, 65.f });
+				prevTimeWhite = currTime;
+				banUnits(unitW);
+			}
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && currTime - prevTimeWhite > INTERVAL_TIME) {
+			if (unitW->getPositionX() > 90) {
+				unitW->setPosition(unitW->getPosition() - sf::Vector2f{ 90.f, 0.f });
+				prevTimeWhite = currTime;
+				banUnits(unitW);
+			}
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && currTime - prevTimeWhite > INTERVAL_TIME) {
+			if (unitW->getPositionX() < 920) {
+				unitW->setPosition(unitW->getPosition() + sf::Vector2f{ 90.f, 0.f });
+				prevTimeWhite = currTime;
+				banUnits(unitW);
+			}
+		}
+	}
+}
+
+void Game::unitBlackUpdate(Units* unitB) {
+	if (alternate == 0) {
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) && currTime - prevTimeBlack > INTERVAL_TIME) {
+			if (unitB->getPositionY() > 135) {
+				unitB->setPosition(unitB->getPosition() - sf::Vector2f{ 0.f, 65.f });
+				prevTimeBlack = currTime;
+				banUnits(unitB);
+			}
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && currTime - prevTimeBlack > INTERVAL_TIME) {
+			if (unitB->getPositionY() < 380) {
+				unitB->setPosition(unitB->getPosition() + sf::Vector2f{ 0.f, 65.f });
+				prevTimeBlack = currTime;
+				banUnits(unitB);
+			}
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && currTime - prevTimeBlack > INTERVAL_TIME) {
+			if (unitB->getPositionX() > 90) {
+				unitB->setPosition(unitB->getPosition() - sf::Vector2f{ 90.f, 0.f });
+				prevTimeBlack = currTime;
+				banUnits(unitB);
+			}
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && currTime - prevTimeBlack > INTERVAL_TIME) {
+			if (unitB->getPositionX() < 820) {
+				unitB->setPosition(unitB->getPosition() + sf::Vector2f{ 90.f, 0.f });
+				prevTimeBlack = currTime;
+				banUnits(unitB);
+			}
+		}
+	}
+}
+
+void Game::playerUnit(sf::RenderWindow& window) {
+	for (auto player : playerWhiteSprites)
+		window.draw(player->getSprite());
+	for (auto player : playerBlackSprites)
+		window.draw(player->getSprite());
+	for (auto unit : unitWhiteSprites)
+		unit->draw(window);
+	for (auto unit : unitBlackSprites)
+		unit->draw(window);
+	for (auto banMarks : banMark)
+		banMarks->draw(window);
+	mark.draw(window);
+}
+
+void Game::allText(sf::RenderWindow& window) {
+	text_player_go.draw(window);
+	text_player_unit.draw(window);
+	text_for_ban.draw(window);
+	text_point.draw(window);
+	text_int_point.draw(window);
 }

@@ -1,38 +1,33 @@
-﻿#pragma once
+#pragma once
 #include <SFML/Graphics.hpp>
 
 const float WINDOW_WIDTH = 1000;
-const float WINDOW_HEIGHT = 1000;
-const std::string WINDOW_TITLE = "Space Travel";
+const float WINDOW_HEIGHT = 500;
+const std::string WINDOW_TITLE = "Polutopia";
 const float FPS = 60.f;
 
-const std::string LASER_FILE_NAME = "laser.png";
-const std::string PLAYER_FILE_NAME = "player_blue.png";
-const sf::Vector2f PLAYER_START_POS{ WINDOW_WIDTH / 2, WINDOW_HEIGHT - 200 };
-const float PLAYER_SPEED = 10.f;
+const std::string PLAYER_FILE_NAME = "dom.png";
+const std::string PLAYER1_FILE_NAME = "dom1.png";
 
-const sf::Vector2f MeteorSize{ WINDOW_WIDTH / 2, WINDOW_HEIGHT - 550 };
-const int METEOR_TYPES_QTY = 4;
-const int METEORS_QTY{ 20 };
-
-const std::string IMAGES_FOLDER = "meteor_";
 const std::string FONT_FILE_NAME = "DS-DIGIB.ttf";
 const int FONT_SIZE = 32;
 
-const float RECT_WIDTH = 250.f;
-const float RECT_HEIGHT = 15.f;
-const sf::Color RECT_COLOR{ sf::Color(0, 0, 0) };
-const sf::Vector2f RECT_POS{ 0, 0 };
+const float BLOCK_WIDTH = 85.f;
+const float BLOCK_HEIGHT = 60.f;
+const sf::Color BLOCK_COLOR{ sf::Color(28, 255, 50) };
+const sf::Vector2f BLOCK_POS{ 0, 0 };
 
-const int FIRE_COOLDOWN = 200;
-const size_t MULTI_LASER_BONUS_DURATION = 5000;
-const int BONUS_USING = 20;
-const size_t SHIELD_MARGIN = 10;
+const int COL_LINE = 10;
+const int COL_ROW = 6;
 
-const std::string MULTI_LASER_BONUS_FILE_NAME = "things_silver.png";
-const std::string HP_UP_BONUS_FILE_NAME = "pill_green.png";
-const std::string SHIELD_UP_BONUS_FILE_NAME = "shield_silver.png";
-const std::string SHIELD_EFFECT_BONUS_FILE_NAME = "shield2.png";
-const float BONUS_SPEED = 10.f;
-const int BONUS_RANGE = 10000;
-const int BONUS_CHANCE = 1000;
+const std::string SWORDSMAN_UNITS_FILE_NAME = "swordsman.png";
+const std::string ARCHER_UNITS_FILE_NAME = "archer.png";
+const std::string BUILDER_UNITS_FILE_NAME = "duilder.png";
+const std::string SWORDSMAN1_UNITS_FILE_NAME = "swordsman1.png";
+const std::string ARCHER1_UNITS_FILE_NAME = "archer1.png";
+const std::string BUILDER1_UNITS_FILE_NAME = "duilder1.png";
+
+const std::string MARK_FILE_NAME = "mark.png";
+const std::string BAN_MARK_FILE_NAME = "ban_mark.png";
+const int INTERVAL_TIME = 350;
+const int MARK_INTERVAL_TIME = 150;
